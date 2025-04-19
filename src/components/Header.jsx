@@ -16,7 +16,7 @@ const Header = () => {
             home
           </NavLink>
           <NavLink className="px-4 py-2 capitalize" to="/products">
-            product
+          our menu
           </NavLink>
           <NavLink className="px-4 py-2 capitalize" to="/about">
             about
@@ -102,15 +102,13 @@ const Header = () => {
           <NavLink className="px-4 py-2 capitalize" to="/contact">
             contact
           </NavLink>
-          {isLoggedIn && (
-            <>
               <NavLink className="px-4 py-2 capitalize" to="/products">
-                product
+                our menu
               </NavLink>
+          {isLoggedIn && (
               <button className="bg-amber-600 text-white px-4 py-2 rounded-lg w-full">
                 log out
               </button>
-            </>
           )}
           {!isLoggedIn && (
             <>
