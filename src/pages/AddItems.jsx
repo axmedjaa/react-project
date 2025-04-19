@@ -28,17 +28,20 @@ const AddItems = () => {
                 price: data.price || '',
                 tags: data.tags || [],
                 image: null,
-                image_url: data.image_url
+                image_url: data.image_url||null
             })
         }
     }
   }
   const categoryTags = [
+    "all",
     "Breakfast",
     "Brunch",
     "Lunch",
     "Dinner",
-    "Snack"
+    "Snack",
+    "drink",
+    "fast food"
   ];
   const toggleTag=(tag)=>{
     setFormData((prev=>({...prev,tags:prev.tags.includes(tag)?prev.tags.filter(t=>t!==tag):[...prev.tags,tag]})))
