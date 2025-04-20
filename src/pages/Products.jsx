@@ -94,7 +94,7 @@ const Products = () => {
               <Link
                 className="bg-white p-4 rounded-lg shadow hover:shadow-md hover:scale-105 
                 transform transition-transform duration-300 hover:transition-all"
-                to={`product/${item.id}`}
+                to={`/product/${item.id}`}
                 key={item.id}
               >
                 <img
