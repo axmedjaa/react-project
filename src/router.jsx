@@ -15,6 +15,8 @@ import SeeOrders from "./pages/SeeOrders";
 import ManageAds from "./pages/ManageAds";
 import DashboardOverview from "./pages/DashboardOverview";
 import AddItems from "./pages/AddItems";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Cart from "./pages/Cart";
 const router=createBrowserRouter([
     {
         path:"/",
@@ -48,6 +50,10 @@ const router=createBrowserRouter([
             {
                 path:"signin",
                 element:<AuthProtectedRoute><Signin/></AuthProtectedRoute>
+            },
+            {
+                path:"cart",
+                element:<ProtectedRoute><Cart/></ProtectedRoute>
             },
             {
                 path:"dashboard",

@@ -45,7 +45,6 @@ const Header = () => {
           {isLoggedIn && (
             <div className="relative flex items-center gap-2 px-2 mt-2">
               <span className="hidden sm:block">{profile?.username}</span>
-
               <button
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-yellow-500 to-red-500 text-white font-semibold shadow-md uppercase"
                 onMouseEnter={() => setIsDropDownOpen(true)}
@@ -60,7 +59,7 @@ const Header = () => {
                   onMouseLeave={() => setIsDropDownOpen(false)}
                 >
                  {!isAdmin&& <Link
-                    to="/added"
+                    to="/cart"
                     className="block px-4 py-2 hover:bg-gray-100 transition duration-150"
                   >
                     Add
