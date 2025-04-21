@@ -3,12 +3,14 @@ import { useNavigate, useParams } from "react-router"
 import { supabase } from "../lib/supabase"
 import toast from "react-hot-toast"
 import { IoArrowBackOutline } from "react-icons/io5"
+import { useAuth } from "../context/Context"
 
 const Product = () => {
   const{id}=useParams()
   const[item,setItem]=useState(null)
   const[isLoading,setIsLoading]=useState(false)
   const navigate=useNavigate()
+  const{isLoggedIn}=useAuth()
   useEffect(()=>{
     fetchItem()
   },[id])
@@ -45,6 +47,55 @@ const Product = () => {
   const handleBack=()=>{
     navigate(-1)
   }
+const handleCart =async () => {
+  if (!isLoggedIn) {
+    toast.custom((choose) => (
+      <span className="fixed top-20 right-6 bg-white p-4 shadow-lg rounded-xl w-72">
+        You need to be signed in to add to cart
+        <div className="mr-2 flex gap-2">
+          <button
+            onClick={() => {
+              toast.dismiss(choose.id);
+              navigate("/signin");
+            }}
+            className="text-sm bg-blue-500 text-white px-3 py-1 rounded"
+          >
+            Sign in
+          </button>
+          <button
+            onClick={() => {
+              toast.dismiss(choose.id);
+            }}
+            className="text-sm bg-gray-500 text-white px-3 py-1 rounded"
+          >
+            Not now
+          </button>
+        </div>
+      </span>
+    ));
+    return
+  }
+  try {
+    const{data:user}=await supabase.auth.getUser()
+    const{error}=await supabase.from('cart')
+    .insert({
+      user_id:user.id,
+      product_id:item.id,
+      item_name:item.name,
+      price:item.price,
+      image_url:item.image_url,
+      tags:item.tags,
+      describe:item.describe,
+      quantity:state.quantity
+    })
+    if(error)throw error
+    toast.success("Added to cart!");
+  } catch (error) {
+    console.error("Error adding to cart:", error)
+    toast.error("Something went wrong.");
+  }
+};
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
@@ -89,6 +140,7 @@ const Product = () => {
             {item.describe&&<p>{item.describe}</p>}
             <div className="space-x-1 mt-2">
               <button
+              onClick={handleCart}
               className="bg-orange-500 text-white py-2 px-4 rounded-lg">add to cart</button>
               <button className="bg-orange-500 text-white py-2 px-4 rounded-lg">buy now</button>
             </div>
