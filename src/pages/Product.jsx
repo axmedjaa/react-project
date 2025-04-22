@@ -9,6 +9,9 @@ const Product = () => {
   const{id}=useParams()
   const[item,setItem]=useState(null)
   const[isLoading,setIsLoading]=useState(false)
+  const[isAdded,setIsAdded]=useState(false)
+  const [isOrdered, setIsOrdered] = useState(false);
+  const [orderStatus, setOrderStatus] = useState("");
   const navigate=useNavigate()
   const{isLoggedIn}=useAuth()
   useEffect(()=>{
@@ -23,6 +26,11 @@ const Product = () => {
       .single()
       if(error)throw error
       setItem(data)
+       const cartItem = await checkCart(data.id);
+    setIsAdded(cartItem ? true : false);
+    const orderItem=await checkOrder(data.id)
+    setIsOrdered(orderItem?true:false)
+    setOrderStatus(orderItem?.status || "");
       console.log(data)
     } catch (error) {
       console.error("Failed to fetch product",error)
@@ -46,6 +54,24 @@ const Product = () => {
   const[state,dispatch]=useReducer(reducer,initailState)
   const handleBack=()=>{
     navigate(-1)
+  }
+  const checkCart=async(productId)=>{
+    const { data: { user } } = await supabase.auth.getUser();
+    const{data}=await supabase.from('cart')
+    .select('*')
+    .eq("user_id", user.id)
+    .eq("product_id",productId)
+    .single()
+    return data
+  }
+  const checkOrder=async(productId)=>{
+    const { data: { user } } = await supabase.auth.getUser();
+    const{data}=await supabase.from('order')
+    .select('*')
+    .eq("user_id", user.id)
+    .eq("product_id",productId)
+    .single()
+    return data
   }
 const handleCart =async () => {
   if (!isLoggedIn) {
@@ -76,26 +102,112 @@ const handleCart =async () => {
     return
   }
   try {
-    const{data:user}=await supabase.auth.getUser()
-    const{error}=await supabase.from('cart')
-    .insert({
-      user_id:user.id,
-      product_id:item.id,
-      item_name:item.name,
-      price:item.price,
-      image_url:item.image_url,
-      tags:item.tags,
-      describe:item.describe,
-      quantity:state.quantity
-    })
-    if(error)throw error
-    toast.success("Added to cart!");
+    const { data: { user } } = await supabase.auth.getUser();
+    if(isAdded){
+      const{error}=await supabase.from('cart')
+      .delete()
+      .eq('user_id',user.id)
+      .eq('product_id',item.id)
+      if (error) throw error;
+      toast.success("Removed from cart!");
+      setIsAdded(false);
+    }else{
+      const{error}=await supabase.from('cart')
+      .insert({
+        user_id:user.id,
+        product_id:item.id,
+        item_name:item.name,
+        price:item.price,
+        image_url:item.image_url,
+        tags:item.tags,
+        describe:item.describe,
+        quantity:state.quantity
+      })
+      if(error)throw error
+      toast.success("Added to cart!");
+    setIsAdded(true)
+    }
   } catch (error) {
     console.error("Error adding to cart:", error)
     toast.error("Something went wrong.");
   }
 };
+const handleBuy=async()=>{
+  if (!isLoggedIn) {
+    toast.custom((choose) => (
+      <span className="fixed top-20 right-6 bg-white p-4 shadow-lg rounded-xl w-72">
+        You need to be signed in to add to cart
+        <div className="mr-2 flex gap-2">
+          <button
+            onClick={() => {
+              toast.dismiss(choose.id);
+              navigate("/signin");
+            }}
+            className="text-sm bg-blue-500 text-white px-3 py-1 rounded"
+          >
+            Sign in
+          </button>
+          <button
+            onClick={() => {
+              toast.dismiss(choose.id);
+            }}
+            className="text-sm bg-gray-500 text-white px-3 py-1 rounded"
+          >
+            Not now
+          </button>
+        </div>
+      </span>
+    ));
+    return
+  }
+  try {
+    const{data:{user}}=await supabase.auth.getUser()
+    const result=await fetch('https://ipapi.co/json/')
+    const locatinData=await result.json()
+    const location=`${locatinData.city},${locatinData.country_name}`
+    if(isOrdered){
+      const{error}=await supabase.from('order')
+      .delete()
+      .eq("user_id", user.id)
+      .eq("product_id", item.id);
+      if(error)throw error
+      toast.success("Order canceled");
+      setIsOrdered(false);
+      setOrderStatus('')
+    }else{
+      const{error}=await supabase.from('order')
+  .insert({
+    user_id:user.id,
+    product_id: item.id,
+    item_name: item.name,
+    price: item.price,
+    image_url: item.image_url,
+    quantity: state.quantity,
+    status: "pending",
+    location:location
+  })
+  if(error)throw error
+  toast.success('order placed')
+  setIsOrdered(true);
+  const { data, error:status } = await supabase
+  .from('order')
+  .select('*')
+  .eq("user_id", user.id)
+  .eq("product_id", item.id)
+  .single();
 
+if (status) {
+  console.error("Error fetching order status:", error.message);
+  return;
+}
+
+setOrderStatus(data.status);
+    }
+  } catch (error) {
+    console.error("Failed to place order:", error.message);
+    toast.error("Could not place the order.");
+  }
+}
   if (isLoading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
@@ -138,11 +250,22 @@ const handleCart =async () => {
             </span>
             <span className="text-lg sm:text-xl font-semibold">${item.price*state.quantity}</span>
             {item.describe&&<p>{item.describe}</p>}
+            {orderStatus && (
+              <p className="text-sm text-gray-500 mt-2">
+                Order Status: <span className="font-bold text-orange-400">{orderStatus}</span>
+              </p>
+            )}
             <div className="space-x-1 mt-2">
               <button
               onClick={handleCart}
-              className="bg-orange-500 text-white py-2 px-4 rounded-lg">add to cart</button>
-              <button className="bg-orange-500 text-white py-2 px-4 rounded-lg">buy now</button>
+              className="bg-orange-500 text-white py-2 px-4 rounded-lg">{
+                isAdded?'remove cart':'add to cart'
+              }</button>
+              <button
+              onClick={handleBuy}
+              className="bg-orange-500 text-white py-2 px-4 rounded-lg">
+                {isOrdered?'cancel order':'buy now'}
+              </button>
             </div>
           </div>
         </div>
