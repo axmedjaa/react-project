@@ -162,6 +162,12 @@ const handleBuy=async()=>{
   }
   try {
     const{data:{user}}=await supabase.auth.getUser()
+    const { data: userinfo, error:errorInfo } = await supabase
+  .from('users')
+  .select()
+  .eq('id', user.id)
+  .single()
+  if(errorInfo)throw errorInfo
     const result=await fetch('https://ipapi.co/json/')
     const locatinData=await result.json()
     const location=`${locatinData.city},${locatinData.country_name}`
@@ -178,6 +184,7 @@ const handleBuy=async()=>{
       const{error}=await supabase.from('order')
   .insert({
     user_id:user.id,
+    user_name:userinfo.username,
     product_id: item.id,
     item_name: item.name,
     price: item.price,

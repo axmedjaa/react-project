@@ -85,7 +85,9 @@ const ManageAds = () => {
                 >
                   update
                 </Link>
-                <Link className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-600 transition">
+                <Link
+                 to={`/product/${item.id}`}
+                className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-600 transition">
                   view
                 </Link>
               </div>
