@@ -19,6 +19,7 @@ const AdminDashboard = () => {
           <li><Link to="/dashboard/ads">Adds</Link></li>
           <li><Link to="/dashboard/manage">Manage Ads</Link></li>
           <li><Link to="/dashboard/orders">See Orders</Link></li>
+          <li><Link to="/dashboard/message">messages</Link></li>
         </ul>
       </nav>
       {/* Main content */}

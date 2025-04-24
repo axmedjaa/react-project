@@ -17,6 +17,7 @@ import DashboardOverview from "./pages/DashboardOverview";
 import AddItems from "./pages/AddItems";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Cart from "./pages/Cart";
+import Mesages from "./pages/Mesages";
 const router=createBrowserRouter([
     {
         path:"/",
@@ -78,6 +79,10 @@ const router=createBrowserRouter([
                     {
                         path:"orders",
                         element:<SeeOrders/>
+                    },
+                    {
+                        path:"message",
+                        element:<Mesages/>
                     }
                 ]
             }
