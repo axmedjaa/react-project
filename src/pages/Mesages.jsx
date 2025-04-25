@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import toast from "react-hot-toast";
 
 const Mesages = () => {
   const [message, setMessage] = useState([]);
@@ -41,7 +42,19 @@ const Mesages = () => {
       console.error("Error replying to message:", error);
     }
   };
-
+  const handleDlete=async(id)=>{
+    const{error}=await supabase.from('contact')
+    .delete()
+    .eq('id',id)
+    if(error){
+      console.error("Error deleting message:", error);
+      toast.error("Failed to delete message.");
+    }else{
+      toast.success("Message deleted.");
+      setMessage((prev)=>prev.filter((item)=>item.id!==id))
+      fetchMeassge();
+    }
+  }
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -83,6 +96,12 @@ const Mesages = () => {
               >
                 Reply
               </button>
+              <button 
+                  className="mt-2 text-sm text-white px-4 py-2 ml-2 rounded-lg bg-red-500 hover:underline"
+                  onClick={()=>{handleDlete(mes.id)}}
+                  >
+                    delete
+                  </button>
             </div>
           ))}
           {selectedMessageId && (
@@ -99,7 +118,7 @@ const Mesages = () => {
                   placeholder="Type your reply here"
                 ></textarea>
                 <button
-                  className="w-full mt-4 bg-orange-500 text-white px-6 py-3 rounded-2xl font-medium hover:bg-orange-600 transition"
+                  className="w-full mt-4 bg-orange-500  text-white px-6 py-3 rounded-2xl font-medium hover:bg-orange-600 transition"
                   type="submit"
                 >
                   Send Reply

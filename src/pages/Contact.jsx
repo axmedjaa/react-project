@@ -24,8 +24,6 @@ const Contact = () => {
     const{data:{user},error}=await supabase.auth.getUser()
     if (error) {
       console.error("Error getting user:", error);
-      toast.error('')
-      toast.error("Failed to get user.");
     } else {
       setUserId(user?.id);
     }
@@ -74,9 +72,22 @@ const Contact = () => {
     } else {
       toast.success("Message sent successfully!");
       setFormData({ name: "", email: "", message: "" });
+      fetchMeassge()
     }
   };
-
+  const handleDlete=async(id)=>{
+    const{error}=await supabase.from('contact')
+    .delete()
+    .eq('id',id)
+    if(error){
+      console.error("Error deleting message:", error);
+      toast.error("Failed to delete message.");
+    }else{
+      toast.success("Message deleted.");
+      setMessages((prev)=>prev.filter((item)=>item.id!==id))
+      fetchMeassge();
+    }
+  }
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -169,6 +180,12 @@ const Contact = () => {
                       <p className="text-gray-700">{mes.reply}</p>
                     </div>
                   )}
+                  <button 
+                 className="mt-2 text-sm text-white px-4 py-2 ml-2 rounded-lg bg-red-500 hover:underline"
+                  onClick={()=>{handleDlete(mes.id)}}
+                  >
+                    delete
+                  </button>
                 </div>
               ))}
             </div>
