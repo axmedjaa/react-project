@@ -62,7 +62,7 @@ const Header = () => {
                     to="/cart"
                     className="block px-4 py-2 hover:bg-gray-100 transition duration-150"
                   >
-                    Add
+                    cart
                   </Link>}
                   {isAdmin && (
                     <Link className="px-4 py-2 capitalize" to="/dashboard">
