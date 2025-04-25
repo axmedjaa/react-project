@@ -119,7 +119,7 @@ const handleCart =async () => {
         item_name:item.name,
         price:item.price,
         image_url:item.image_url,
-        tags:item.tags,
+        tags:item.tags, 
         describe:item.describe,
         quantity:state.quantity
       })
@@ -207,7 +207,6 @@ if (status) {
   console.error("Error fetching order status:", error.message);
   return;
 }
-
 setOrderStatus(data.status);
     }
   } catch (error) {

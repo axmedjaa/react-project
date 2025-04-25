@@ -105,7 +105,11 @@ const Header = () => {
                 our menu
               </NavLink>
           {isLoggedIn && (
-              <button className="bg-amber-600 text-white px-4 py-2 rounded-lg w-full">
+              <button 
+              onClick={()=>{
+                logout()
+              }}
+              className="bg-amber-600 text-white px-4 py-2 rounded-lg w-full">
                 log out
               </button>
           )}
