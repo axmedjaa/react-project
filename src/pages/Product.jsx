@@ -34,7 +34,6 @@ const Product = () => {
       console.log(data)
     } catch (error) {
       console.error("Failed to fetch product",error)
-      toast.error(error.message)
     }
     finally{
       setIsLoading(false)
