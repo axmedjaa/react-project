@@ -15,11 +15,6 @@ const Contact = () => {
   useEffect(()=>{
     currentUser()
   },[])
-  useEffect(() => {
-    if (userId) {
-      fetchMeassge();
-    }
-  },[userId]);
   const currentUser=async()=>{
     const{data:{user},error}=await supabase.auth.getUser()
     if (error) {
@@ -88,6 +83,15 @@ const Contact = () => {
       fetchMeassge();
     }
   }
+  const handleOpen=()=>{
+    setIsOpen((prev)=>{
+      const  newState=!prev
+      if(newState&&userId){
+        fetchMeassge
+      }
+      return newState
+    })
+  }
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -154,7 +158,7 @@ const Contact = () => {
         <h2 className="text-2xl font-bold mt-8 mb-2">Your Messages</h2>
         <button
         className="mt-4 mb-2 px-4 py-2 bg-orange-500 text-white rounded-2xl hover:bg-orange-600 transition"
-        onClick={()=>setIsOpen(!isOpen)}>{isOpen?'close messaga':'open massage'}</button>
+        onClick={handleOpen}>{isOpen?'close messages':'open massages'}</button>
        {
         isOpen&&(
           <div>
